@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>[{{ r.severity }}] {{ r.title }} – RCA Incident Report</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-blue: #38bdf8;
+      --sev1: #ef4444;
+      --sev2: #f97316;
+      --sev3: #eab308;
+      --sev4: #22c55e;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #0b1120;
+      color: var(--text-main);
+      margin: 0;
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+    .badge-sev {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+    .SEV1 { background-color: var(--sev1); }
+    .SEV2 { background-color: var(--sev2); }
+    .SEV3 { background-color: var(--sev3); color: #000; }
+    .SEV4 { background-color: var(--sev4); }
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.85rem;
+      font-weight: 700;
+      line-height: 1.25;
+      color: #ffffff;
+    }
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--card-border);
+      padding-top: 1rem;
+      margin-top: 1rem;
+    }
+    .meta-item b {
+      color: var(--text-main);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent-blue);
+      margin-top: 0;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .root-cause-box {
+      background: rgba(249, 115, 22, 0.1);
+      border-left: 4px solid var(--sev2);
+      border-radius: 4px;
+      padding: 1.2rem;
+      color: #fdba74;
+      font-size: 1.05rem;
+      font-weight: 500;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+    th {
+      background: #0f172a;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    pre {
+      background: #090d16;
+      border: 1px solid var(--card-border);
+      color: #38bdf8;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    ul, ol {
+      margin: 0;
+      padding-left: 1.5rem;
+    }
+    li {
+      margin-bottom: 0.5rem;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--card-border);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="badge-sev {{ r.severity }}">{{ r.severity }} Incident</span>
+      <h1>{{ r.title }}</h1>
+      <div class="meta-bar">
+        <div class="meta-item">Status: <b>Diagnosed</b></div>
+        <div class="meta-item">Confidence: <b>{{ r.confidence | upper }}</b></div>
+        <div class="meta-item">Affected Services: <b>{{ r.affected_services | join(", ") }}</b></div>
+        <div class="meta-item">Generated: <b>{{ generated }}</b></div>
+      </div>
+    </div>
+
+    <!-- Stakeholder Summary -->
+    <div class="card">
+      <h2 class="card-title">📌 Executive Summary</h2>
+      <p>{{ r.stakeholder_summary or r.summary }}</p>
+    </div>
+
+    <!-- Root Cause -->
+    <div class="card">
+      <h2 class="card-title">🔍 Root Cause Analysis</h2>
+      <div class="root-cause-box">
+        {{ r.root_cause }}
+      </div>
+      {% if r.contributing_factors %}
+      <h4 style="color: var(--text-muted); margin: 1.25rem 0 0.5rem 0;">Contributing Factors:</h4>
+      <ul>
+        {% for factor in r.contributing_factors %}
+        <li>{{ factor }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+
+    <!-- Impact Assessment -->
+    <div class="card">
+      <h2 class="card-title">💥 Impact Assessment</h2>
+      <p>{{ r.impact }}</p>
+    </div>
+
+    <!-- Incident Timeline -->
+    <div class="card">
+      <h2 class="card-title">⏱️ Incident Timeline</h2>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 25%;">Timestamp</th>
+            <th>Observed Event / Telemetry</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for t in r.timeline %}
+          <tr>
+            <td style="color: var(--accent-blue); font-family: monospace;">{{ t.time }}</td>
+            <td>{{ t.event }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Diagnostic Evidence & Logs -->
+    <div class="card">
+      <h2 class="card-title">📑 Diagnostic Evidence (Cluster Logs & Events)</h2>
+      {% for item in r.evidence %}
+      <div style="margin-bottom: 1rem;">
+        <div style="font-weight: 600; font-size: 0.875rem; color: #cbd5e1; margin-bottom: 0.35rem;">
+          Source: <span style="color: var(--accent-blue);">{{ item.source }}</span>
+        </div>
+        <pre>{{ item.excerpt }}</pre>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Remediation & Action Plan -->
+    <div class="card">
+      <h2 class="card-title">🛠️ Recommended Remediation Steps</h2>
+      <ol>
+        {% for step in r.resolution %}
+        <li>{{ step }}</li>
+        {% endfor %}
+      </ol>
+    </div>
+
+    <!-- Long-term Prevention -->
+    <div class="card">
+      <h2 class="card-title">🛡️ Long-Term Prevention & Hardening</h2>
+      <ul>
+        {% for prev in r.prevention %}
+        <li>{{ prev }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="footer">
+      Generated automatically by <b>AI SRE Agent</b> • RCA Platform • Kubernetes Live Cluster Observer
+    </div>
+  </div>
+</body>
+</html>

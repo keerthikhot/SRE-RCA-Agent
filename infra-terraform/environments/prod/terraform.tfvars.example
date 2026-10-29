@@ -1,0 +1,47 @@
+###############################################################################
+# terraform.tfvars.example
+#
+# Copy this file to terraform.tfvars and fill in real values.
+# NEVER commit terraform.tfvars to Git (it's in .gitignore).
+###############################################################################
+
+project     = "ai-sre-agent"
+environment = "prod"
+aws_region  = "ap-south-1"
+
+# Your GitHub repository (owner/repo)
+github_repo = "your-github-org/ai-sre-agent"
+
+#---------------------------------------
+# Network
+#---------------------------------------
+vpc_cidr        = "10.0.0.0/16"
+public_subnets  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnets = ["10.0.11.0/24", "10.0.12.0/24"]
+azs             = ["ap-south-1a", "ap-south-1b"]
+
+# Restrict to your IP in production!
+ssh_allowed_cidrs = ["YOUR_PUBLIC_IP/32"]
+
+#---------------------------------------
+# Compute
+#---------------------------------------
+k3s_instance_type   = "t3.small"   # t3.small is Free-Tier eligible in ap-south-1
+root_volume_size_gb = 30
+k3s_version         = ""            # "" = latest; or e.g. "v1.30.2+k3s1"
+
+# Paste your ~/.ssh/id_rsa.pub here (or leave empty to use SSM Session Manager)
+ssh_public_key = ""
+
+#---------------------------------------
+# IAM / Backend
+#---------------------------------------
+create_github_oidc_role = true
+tfstate_bucket          = "ai-sre-agent-tfstate-58117740"
+tflock_table            = "ai-sre-agent-tflock"
+
+#---------------------------------------
+# Application
+#---------------------------------------
+ses_sender_email  = "alerts@yourdomain.com"
+ecr_repositories  = ["ai-sre-agent", "order-service", "product-service"]
