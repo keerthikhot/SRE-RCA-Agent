@@ -1,6 +1,8 @@
 import os
 import html
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+
+IST = timezone(timedelta(hours=5, minutes=30), name="IST")
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
@@ -12,8 +14,8 @@ LATEST_REPORT: dict = {}
 
 def render_rca(rca: dict) -> tuple[str, str]:
     global LATEST_REPORT
-    now = datetime.now(timezone.utc)
-    timestamp_str = now.strftime("%Y-%m-%d %H:%M UTC")
+    now = datetime.now(IST)
+    timestamp_str = now.strftime("%Y-%m-%d %H:%M IST")
     page = env.get_template("rca.html.j2").render(r=rca, generated=timestamp_str)
     
     os.makedirs(REPORT_DIR, exist_ok=True)
